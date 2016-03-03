@@ -1,8 +1,17 @@
-#You can use code you wrote for the correlation exercise here.
-source("ContinuousFunctions")
-tree <- read.tree("____PATH_TO_TREE_OR_SOME_OTHER_WAY_OF_GETTING_A_TREE____")
-discrete.data <- read.csv(file="____PATH_TO_DATA_OR_SOME_OTHER_WAY_OF_GETTING_TRAITS____", stringsAsFactors=FALSE) #death to factors.
-continuous.data <- read.csv(file="____PATH_TO_DATA_OR_SOME_OTHER_WAY_OF_GETTING_TRAITS____", stringsAsFactors=FALSE) #death to factors.
+library(geiger)
+setwd("/Users/Hailee/Documents/School/Grad_School/Spring_2016/PhyloMeth/Correlation")
+
+source("CorrelationFunctions.R") # this isn't working?
+tree <- get_study_tree("pg_2346","tree4944")
+plot(tree,cex=0.3)
+discrete.data <- as.matrix(read.csv(file="/Users/Hailee/Desktop/taxa.csv", stringsAsFactors=FALSE,row.names=NULL))#death to factors.
+discrete.data2 <- as.matrix(read.csv(file="/Users/Hailee/Desktop/taxa.csv", stringsAsFactors=FALSE,row.names=1))#death to factors.
+
+latitude<- rnorm(128,mean=89,sd=0.5)
+height<-rnorm(128,mean=2,sd=0.5)
+continuous.data<-cbind(latitude,height)
+rownames(continuous.data)<-tree$tip.label
+
 
 cleaned.continuous <- CleanData(tree, continuous.data)
 cleaned.discrete <- CleanData(tree, discrete.data)
@@ -11,10 +20,10 @@ VisualizeData(tree, cleaned.discrete)
 
 #First, start basic. What is the rate of evolution of your trait on the tree? 
 
-BM1 <- fitContinuous(tree, cleaned.continuous, model="BM")
-print(paste("The rate of evolution is", _____, "in units of", _______))
+BM1 <- fitContinuous(tree, cleaned.continuous$data, model="BM")
+print(paste("The rate of evolution is", BM1$latitude[[4]]$sigsq, "in units of"))
 #Important: What are the rates of evolution? In what units?
-OU1 <- fitContinuous(tree, cleaned.continuous, model="OU")
+OU1 <- fitContinuous(tree, cleaned.continuous$data, model="OU")
 par(mfcol(c(1,2)))
 plot(tree, show.tip.label=FALSE)
 ou.tree <- rescale(tree, model="OU", ___alpha____)
