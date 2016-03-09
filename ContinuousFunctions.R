@@ -1,6 +1,13 @@
 library(ape) #utility fns
 library(geiger) #utilty fns
-library(OUWie)
+library(corHMM)
+library(phylolm)
+library(phytools)
+library(rotl)
+library(phylobase)
+library(ape) #utility fns
+library(geiger) #utilty fns
+library(OUwie)
 
 #You can use code you wrote for the correlation exercise here.
 

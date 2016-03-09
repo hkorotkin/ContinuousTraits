@@ -14,7 +14,7 @@ rownames(continuous.data)<-tree$tip.label
 
 
 cleaned.continuous <- CleanData(tree, continuous.data)
-cleaned.discrete <- CleanData(tree, discrete.data)
+cleaned.discrete <- CleanData(tree, discrete.data2)
 VisualizeData(tree, cleaned.continuous)
 VisualizeData(tree, cleaned.discrete)
 
@@ -23,18 +23,18 @@ VisualizeData(tree, cleaned.discrete)
 BM1 <- fitContinuous(tree, cleaned.continuous$data, model="BM")
 print(paste("The rate of evolution is", BM1$latitude[[4]]$sigsq, "in units of"))
 #Important: What are the rates of evolution? In what units?
-OU1 <- fitContinuous(tree, cleaned.continuous$data, model="OU")
-par(mfcol(c(1,2)))
+OU1 <- fitContinuous(tree, cleaned.continuous$data[,'latitude'], model="OU")
+par(mfcol=c(1,2))
 plot(tree, show.tip.label=FALSE)
-ou.tree <- rescale(tree, model="OU", ___alpha____)
-plot(ou.tree)
+ou.tree <- rescale(tree, model="OU", alpha=OU1[[4]]$alpha)
+plot(ou.tree,show.tip.label=FALSE)
 #How are the trees different?
 
 #Compare trees
-AIC.BM1 <- ________FIGURE_OUT_HOW_TO_DO_THIS_____
-AIC.OU1 <- ________FIGURE_OUT_HOW_TO_DO_THIS_____
-delta.AIC.BM1 <- ________FIGURE_OUT_HOW_TO_DO_THIS_____
-delta.AIC.OU1 <- ________FIGURE_OUT_HOW_TO_DO_THIS_____
+AIC.BM1 <- BM1$latitude[[4]]$aic
+AIC.OU1 <- OU1[[4]]$aic
+delta.AIC.BM1 <-AIC.BM1 - min(c(AIC.BM1,AIC.OU1))
+delta.AIC.OU1 <- AIC.OU1 - min(c(AIC.BM1,AIC.OU1))
 
 
 
@@ -47,14 +47,15 @@ delta.AIC.OU1 <- ________FIGURE_OUT_HOW_TO_DO_THIS_____
 
 #First, we need to assign regimes. The way we do this is with ancestral state estimation of a discrete trait.
 #We can do this using ace() in ape, or similar functions in corHMM or diversitree. Use only one discrete char
-one.discrete.char <- _____________
-reconstruction.info <- ace(one.discrete.char, tree, type="discrete", method="ML", CI=FALSE)
+one.discrete.char <- discrete.data[,"saprotrophic"]
+names(one.discrete.char)<-tree$tip.label
+reconstruction.info <- ace(one.discrete.char, tree, type="discrete", method="ML", CI=TRUE)#maybe change to true
 best.states <- colnames(reconstruction.info)[apply(reconstruction.info$lik.anc, 1, which.max)]
 
 
 #NOW ADD THESE AS NODE LABELS TO YOUR TREE
 
-labeled.tree <- ________________
+labeled.tree <-
 
 
 nodeBased.OUMV <- OUwie(tree, cleaned.continuous,model="OUMV", simmap.tree=FALSE, diagn=FALSE)
