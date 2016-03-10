@@ -50,21 +50,27 @@ delta.AIC.OU1 <- AIC.OU1 - min(c(AIC.BM1,AIC.OU1))
 one.discrete.char <- discrete.data[,"saprotrophic"]
 names(one.discrete.char)<-tree$tip.label
 reconstruction.info <- ace(one.discrete.char, tree, type="discrete", method="ML", CI=TRUE)#maybe change to true
-best.states <- colnames(reconstruction.info)[apply(reconstruction.info$lik.anc, 1, which.max)]
+best.states <- apply(reconstruction.info$lik.anc, 1, which.max)
 
 
 #NOW ADD THESE AS NODE LABELS TO YOUR TREE
 
-labeled.tree <-
+labeled.tree <-tree; labeled.tree$node.label <- best.states
 
+tips<-rownames(cleaned.continuous$data)
+cleaned.continuous2<-data.frame(tips,cleaned.discrete$data[,'saprotrophic'],cleaned.continuous$data[,'latitude'])
+colnames(cleaned.continuous2) <- c("tips","regime","latitude")
 
-nodeBased.OUMV <- OUwie(tree, cleaned.continuous,model="OUMV", simmap.tree=FALSE, diagn=FALSE)
+nodeBased.OUMV <- OUwie(labeled.tree, cleaned.continuous2,model="OUMV", simmap.tree=FALSE, diagn=FALSE)
 print(nodeBased.OUMV)
 #What do the numbers mean?
+#Warning with this?
 
 #Now run all OUwie models:
-models <- c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA")
-results <- lapply(models, RunSingleOUwieModel, phy=tree, data=trait)
+models <- c("BM1","BMS","OU1","OUMV","OUMA","OUMVA") ##OUM not working, man
+results <- lapply(models, RunSingleOUwieModel, phy=labeled.tree, data=cleaned.continuous2)
+
+
 
 AICc.values<-sapply(results, "[[", "AICc")
 names(AICc.values)<-models
@@ -83,7 +89,7 @@ print(best) #prints info on best model
 ?OUwie.fixed
 
 #Next, keep all parameters but alpha at their maximum likelihood estimates (better would be to fix just alpha and let the others optimize given this constraint, but this is harder to program for this class). Try a range of alpha values and plot the likelihood against this.
-alpha.values<-seq(from= _______________ , to= _______________ , length.out=50)
+alpha.values<-seq(from=, to=, length.out=50)
 stop("replace the _______________ and delete this stop")
 
 #keep it simple (and slow) and do a for loop:
